@@ -1,0 +1,66 @@
+#!/usr/bin/env node
+
+require('dotenv').config();
+const { Command } = require('commander');
+
+const program = new Command();
+const API_URL = 'https://api.themoviedb.org/3/movie/';
+const token = process.env.TOKEN
+
+const fetchMovies = async (type) => {
+  const endpoints = {
+    playing: 'now_playing',
+    popular: 'popular',
+    top: 'top_rated',
+    upcoming: 'upcoming',
+  };
+
+  if (!endpoints[type]) {
+    console.error('❌ Invalid type. Use one of: playing, popular, top, upcoming.')
+    process.exit(1);
+  }
+
+  const options = {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+      Authorization: `Bearer ${token}`
+    }
+  }
+  
+  try {
+    const response = await fetch(
+      `${API_URL}${endpoints[type]}?language=en-US&page=1`,
+      options
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const data = await response.json();
+    const movies = data.results;
+
+    if (movies.length === 0) {
+      console.log('No movies found.')
+      return;
+    }
+
+    movies.forEach((movie, index) => {
+      console.log(
+        `${index + 1}. ${movie.title} (Rating: ${movie.vote_average}, Release Date: ${movie.release_date})`
+      );
+    });
+  } catch (err) {
+    console.error('❌ Error to fetching movies:', err.message)
+  }
+};
+
+program
+  .description('CLI tool to fetch movies date from TMDB API')
+  .option('--type <type>', 'Type of movies (playing, popular, top, upcoming)')
+  .action((options) => {
+    fetchMovies(options.type)
+  })
+
+program.parse(process.argv)
