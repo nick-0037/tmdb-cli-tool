@@ -1,0 +1,16 @@
+{
+  "name": "tmdb-cli-tool",
+  "version": "1.0.0",
+  "main": "index.js",
+  "bin": {
+    "tmdb-app": "./tmdb-app"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "commander": "^12.1.0",
+    "dotenv": "^16.4.7"
+  }
+}
